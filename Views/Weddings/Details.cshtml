@@ -1,0 +1,54 @@
+@model Wedding
+
+@{
+    bool alreadyRSVPd = Model.WeddingGuestRSVPd.Any(r => r.UserId == Context.Session.GetInt32("UserId"));
+}
+
+<h2 class="text-center">Wedding Details</h2>
+
+    <div class="card shadow rounded w-100 mb-3 mx-auto">
+        <h4 class="card-title text-center bg-dark text-light py-2 rounded-top">
+            @Model.WedderOne and @Model.WedderTwo's Wedding
+        </h4>
+
+        <div class="card-body">
+            <p class="card-text">@Model.Date</p>
+            <small class="text-muted">Planned by @Model.Planner.FullName()</small>
+            <h3>Guests:</h3>
+            <ul>
+                @foreach (WeddingGuestRSVP RSVPer in Model.WeddingGuestRSVPd)
+                {
+                    <li>@RSVPer.User.FullName()</li>
+                }
+            </ul>
+        </div>
+
+        @if (Model.ImgUrl != null)
+        {
+            <img src="@Model.ImgUrl" alt="@Model.WeddingAddress">
+        }
+
+        <div class="container">
+            <div class="card-footer row justify-content-center">
+                <form asp-controller="Weddings" asp-action="RSVP" asp-route-weddingId="@Model.WeddingId" method="post">
+                    <button class="btn btn-link">
+                        @if (alreadyRSVPd)
+                        {
+                            <span class="text-warning">UnRSVP</span>
+                        }
+                        else
+                        {
+                            <span>RSVP</span>
+                        }
+                    </button>
+                </form>
+
+                @if (Model.UserId == Context.Session.GetInt32("UserId"))
+                {
+                    <form asp-controller="Weddings" asp-action="Delete" asp-route-weddingId="@Model.WeddingId" method="post">
+                        <button class="btn btn-link text-danger">Delete</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
